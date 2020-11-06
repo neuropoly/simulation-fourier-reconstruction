@@ -1,2 +1,2 @@
-# ghosting-artifact
-Code to investigate what might cause the ghosting artifact during real-time z-shim experiments
+# simulation-fourier-reconstruction
+Code to investigate what might cause the different Fourier-realted artifact that we encounter during our experiments.

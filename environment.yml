@@ -1,0 +1,10 @@
+
+name: env-fourier
+dependencies:
+  - pip
+  - python=3.9
+  - opencv
+  - ffmpeg
+  - pip:
+    - numpy
+    - matplotlib

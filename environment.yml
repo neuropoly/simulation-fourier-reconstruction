@@ -6,6 +6,7 @@ dependencies:
   - jupyter_bokeh
   - ffmpeg
   - ipywidgets
+  - scipy
   - pip:
     - numpy
     - matplotlib

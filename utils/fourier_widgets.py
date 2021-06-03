@@ -1,5 +1,6 @@
 import numpy as np
 
+from numpy.fft import *
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, CustomJS, Slider, Title
 from bokeh.plotting import Figure, output_file, show
@@ -62,42 +63,44 @@ def square_signal_decomposition_widget():
 
     nb_points = 100
     x = np.linspace(0, 1, nb_points)
-    y = [np.zeros((nb_points, len(x)))]
     xs = []
     ys = []
 
-    for n in range(nb_points):
+    for n in range(33):
         xs.append(x)
         ys.append(4 / np.pi * np.sin(3 * np.pi * (2 * n + 1) * x) / (2 * n + 1))
 
-    y_display = ys
-
-    source = ColumnDataSource(data=dict(x=x, y_sum=sum(ys), xs=xs, ys=ys, y_display=ys, color=Blues[256][56:256:2],
-                                        alpha=np.linspace(1, 0, 100)))
+    source1 = ColumnDataSource(data=dict(x=x, y_sum=sum(ys)))
+    source2 = ColumnDataSource(data=dict(xs=xs, ys=ys, y_display=ys, color=Blues[256][64:225:5], width=np.linspace(5, 1, 33)))
 
     s1 = Figure(plot_width=900, plot_height=300)
-    s1.multi_line(xs='xs', ys='y_display', source=source, line_width=5, color='color', line_alpha='alpha')
+    s1.multi_line(xs='xs', ys='y_display', source=source2, color='color', line_width='width')
     s1.title.text = "Fourier decomposition of a square signal"
     s1.title.align = "center"
-    s1.title.text_color = '#5a9bc7'
+    s1.title.text_color = Blues[256][64]
     s1.title.text_font_size = "25px"
     s1.add_layout(Title(text="Time (s)", align="center"), "below")
     s1.xaxis.minor_tick_line_color = None
     s1.yaxis.minor_tick_line_color = None
 
     s2 = Figure(plot_width=900, plot_height=300)
-    s2.line('x', 'y_sum', source=source, line_width=5, line_color='#5a9bc7')
+    s2.line('x', 'y_sum', source=source1, line_width=5, line_color=Blues[256][64])
     s2.xaxis.minor_tick_line_color = None
     s2.yaxis.minor_tick_line_color = None
+    s2.title.text = "Resulting signal (sum of the sinusoids)"
+    s2.title.align = "center"
+    s2.title.text_color = Blues[256][64]
+    s2.title.text_font_size = "25px"
     s2.add_layout(Title(text="Time (s)", align="center"), "below")
 
-    callback = CustomJS(args=dict(source=source), code="""
-        var data = source.data;
+    callback = CustomJS(args=dict(source1=source1, source2=source2), code="""
+        var data1 = source1.data;
+        var data2 = source2.data;
         var nb_sin = cb_obj.value
-        var x = data['x']
-        var ys = data['ys']
-        var y_sum = data['y_sum']
-        var y_display = data['y_display']
+        var x = data1['x']
+        var ys = data2['ys']
+        var y_sum = data1['y_sum']
+        var y_display = data2['y_display']
 
         for (var i = 0; i <  x.length; i++) { 
             y_sum[i] = 0
@@ -106,6 +109,86 @@ def square_signal_decomposition_widget():
             }
         }
 
+        for (var i = 0; i < nb_sin; i++) {
+            y_display[i] = ys[i]
+        }
+        for (var i = nb_sin; i < 33; i++) {
+            y_display[i] = []
+        }
+
+        source1.change.emit();
+        source2.change.emit();
+
+    """)
+
+    slider_nb_sin = Slider(start=1, end=33, value=33, step=1, title="Number of sinusoïds", bar_color=Blues[256][64])
+    slider_nb_sin.js_on_change('value', callback)
+
+    layout = column(s1, s2, slider_nb_sin)
+    show(layout)
+
+
+def random_signal_decomposition_widget():
+    output_notebook()
+
+    nb_points = 50
+    signal = np.asarray(np.random.rand(nb_points))
+    fft_signal = fft(signal)
+
+    x = np.linspace(0, nb_points, nb_points)
+    xs = [x]
+    temp = np.zeros(len(x), dtype=complex)
+    temp[0] = fft_signal[0]
+    ys = [np.real(ifft(temp))]
+
+    for n in range(1, nb_points):
+        temp = np.zeros(len(x), dtype=complex)
+        temp[n] = fft_signal[n]
+        y = np.real(ifft(temp))
+        xs.append(x)
+        ys.append(y)
+
+    source1 = ColumnDataSource(data=dict(x=x, y_sum=sum(ys), signal=signal))
+    source2 = ColumnDataSource(
+        data=dict(xs=xs, ys=ys, y_display=ys, color=Blues[256][0:256:256 // nb_points][:nb_points],
+                  width=np.linspace(5, 1, nb_points)))
+
+    s1 = Figure(plot_width=900, plot_height=300)
+    s1.multi_line(xs='xs', ys='y_display', source=source2, color='color', line_width='width')
+    s1.title.text = "Fourier decomposition of a random signal"
+    s1.title.align = "center"
+    s1.title.text_color = Blues[256][64]
+    s1.title.text_font_size = "25px"
+    s1.add_layout(Title(text="Time (s)", align="center"), "below")
+    s1.xaxis.minor_tick_line_color = None
+    s1.yaxis.minor_tick_line_color = None
+
+    s2 = Figure(plot_width=900, plot_height=300)
+    s2.line('x', 'signal', source=source1, line_width=5, line_color='#aaaaaa', legend_label='original signal')
+    s2.line('x', 'y_sum', source=source1, line_width=5, line_color=Blues[256][64], legend_label='sum of the sinusoids')
+    s2.xaxis.minor_tick_line_color = None
+    s2.yaxis.minor_tick_line_color = None
+    s2.title.text = "Resulting signal (sum of the sinusoids)"
+    s2.title.align = "center"
+    s2.title.text_color = Blues[256][64]
+    s2.title.text_font_size = "25px"
+    s2.add_layout(Title(text="Time (s)", align="center"), "below")
+
+    callback = CustomJS(args=dict(source1=source1, source2=source2), code="""
+        var data1 = source1.data;
+        var data2 = source2.data;
+        var nb_sin = cb_obj.value
+        var x = data1['x']
+        var ys = data2['ys']
+        var y_sum = data1['y_sum']
+        var y_display = data2['y_display']
+
+        for (var i = 0; i <  x.length; i++) { 
+            y_sum[i] = 0
+            for (var j = 0; j < nb_sin; j++) {
+                y_sum[i] += ys[j][i]
+            }
+        }
 
         for (var i = 0; i < nb_sin; i++) {
             y_display[i] = ys[i]
@@ -114,10 +197,13 @@ def square_signal_decomposition_widget():
             y_display[i] = []
         }
 
-        source.change.emit();
+        source1.change.emit();
+        source2.change.emit();
+
     """)
 
-    slider_nb_sin = Slider(start=1, end=100, value=100, step=1, title="Number of sinusoïds", bar_color='#5a9bc7')
+    slider_nb_sin = Slider(start=1, end=nb_points, value=nb_points, step=1, title="Number of sinusoïds",
+                           bar_color=Blues[256][64])
     slider_nb_sin.js_on_change('value', callback)
 
     layout = column(s1, s2, slider_nb_sin)

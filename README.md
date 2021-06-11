@@ -5,7 +5,7 @@
 Click on the Binder badge:
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/shimming-toolbox/simulation-fourier-reconstruction/gc/jupyter-notebook)
 
-Wait for Binder to finish building the environment (can take 5-10 minutes), then click on the Jupyter notebook. E.g.: under `simulation-fourier-reconstruction.ipynb`.
+Wait for Binder to finish building the environment (can take 5-10 minutes), then click on the Jupyter notebook (`Fourier-reconstruction_in_MRI.ipynb`).
 
 **Warning:** After 10 minutes of inactivity, binder will stop working and you will have to launch it again.
 

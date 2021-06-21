@@ -1,0 +1,12 @@
+
+name: env-fourier
+dependencies:
+  - pip
+  - python=3.8
+  - ffmpeg
+  - ipywidgets
+  - scipy
+  - pip:
+    - numpy
+    - matplotlib
+    - jupyter_bokeh

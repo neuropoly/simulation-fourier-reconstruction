@@ -3,7 +3,7 @@
 ## Getting started (with Binder)
 
 Click on the Binder badge:
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/shimming-toolbox/simulation-fourier-reconstruction/gc/jupyter-notebook)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/shimming-toolbox/simulation-fourier-reconstruction/HEAD)
 
 Wait for Binder to finish building the environment (can take 5-10 minutes), then click on the Jupyter notebook (`Fourier-reconstruction_in_MRI.ipynb`).
 

@@ -15,7 +15,7 @@ Wait for Binder to finish building the environment (can take 5-10 minutes), then
 
 #### 2) Clone this GitHub repository on your computer:
 ```bash
-git clone hhttps://github.com/shimming-toolbox/simulation-fourier-reconstruction.git
+git clone https://github.com/neuropoly/simulation-fourier-reconstruction.git
 cd simulation-fourier-reconstruction
 ```
 - For Windows user, you might need to [install git](https://git-scm.com/downloads) prior to clone the repository.
